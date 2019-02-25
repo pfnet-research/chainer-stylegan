@@ -9,8 +9,6 @@ RUN_ID=$RANDOM
 EXPR_ID=$1
 EXPR_ID=${EXPR_ID:=0}
 
-MODE=$2
-
 if [ $EXPR_ID -lt 1 ]; then
   echo "Specify the EXPR_ID that is > 0"
   exit 0

@@ -1,7 +1,7 @@
 {
     "name": "ffhq",
-    "source": "/mnt/vol10/datasets/ffhq/ffhq-dataset/hdf5.h5",
-    "metaSource": "/mnt/vol10/datasets/ffhq/ffhq-dataset/hdf5.h5.metadata.json",
+    "source": "../../data/ffhq-hdf5/data.h5",
+    "metaSource": "../../data/ffhq-hdf5/data.h5.metadata.json",
     "type": "hdf5",
     "scaling": "tanh",
     "pipeline": [
