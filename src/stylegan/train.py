@@ -359,9 +359,9 @@ def main():
     else:
         #with chainer.using_config('debug', True):
         trainer.run()
-        
+
     for model, model_name in zip(models, model_names):
-        chainer.serializers.save_npz(FLAGS.out + '/' + model_name + '_latest.npz' % resume_iteration_str, model)
+        chainer.serializers.save_npz(FLAGS.out + '/' + model_name + '_latest.npz', model)
 
 
 import pdb, traceback, sys, code 
