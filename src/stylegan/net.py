@@ -47,7 +47,6 @@ class MappingNetwork(chainer.Chain):
         else:
             # no "dtype" in kwargs for numpy.random.normal
             z = xp.random.normal(size=(batch_size, self.ch, 1, 1)).astype('f')
-        # z /= xp.sqrt(xp.sum(z * z, axis=1, keepdims=True) / self.ch + 1e-8)
         return z
 
     def __call__(self, x):
@@ -106,12 +105,7 @@ class SynthesisBlock(chainer.Chain):
         with self.init_scope(): 
             if not upsample:
                 self.W = chainer.Parameter(shape=(ch_in, 4, 4))
-                # w_data_tmp = np.random.normal(size=(ch_in, 4, 4))
-                # w_data_tmp /= np.sqrt(np.sum(w_data_tmp * w_data_tmp, axis=0, keepdims=True) + 1e-8)
                 self.W.data[:] = 1 # w_data_tmp
-
-            #self.b0 = Scale(axis=1, W_shape=ch, initialW=0)
-            #self.b1 = Scale(axis=1, W_shape=ch, initialW=0)
 
             self.b0 = L.Bias(axis=1, shape=(ch,))
             self.b1 = L.Bias(axis=1, shape=(ch,))
@@ -132,15 +126,11 @@ class SynthesisBlock(chainer.Chain):
         batch_size, _ = w.shape
         if self.upsample:
             assert h is not None
-            # h = F.unpooling_2d(h, 2, 2, 0, outsize=(2 * h.shape[2], 2 * h.shape[3]))
-            # h = F.resize_images(h, (2*h.shape[2], 2*h.shape[3]))
             if self.blur_k is None:
                 k = np.asarray([1, 2, 1]).astype('f')
                 k = k[:, None] * k[None, :]
                 k = k / np.sum(k)
                 self.blur_k = self.xp.asarray(k)[None, None, :]
-            #    self.blur_k = self.xp.asarray(np.broadcast_to(k, (h.shape[1], 3, 3)))[None, :]
-            # h = blur(upscale2x(h), self.blur_k)
             if self.enable_blur:
                 h = blur(upscale2x(h), self.blur_k)
             else:
@@ -241,7 +231,7 @@ class StyleGenerator(chainer.Chain):
                     w = w2
                 h = self.blocks[i](w, x=h, add_noise=add_noise)
 
-            h_0 = self.outs[k](upscale2x(h)) #F.resize_images(h, (2*h.shape[2], 2*h.shape[3])))
+            h_0 = self.outs[k](upscale2x(h))
             h_1 = self.outs[k + 1](self.blocks[k + 1](w, x=h, add_noise=add_noise))
             assert 0. <= alpha < 1.
             h = (1.0 - alpha) * h_0 + alpha * h_1
@@ -312,8 +302,6 @@ class DiscriminatorBlock(chainer.Chain):
         h = x
         h = F.leaky_relu((self.c0(h)))
         h = F.leaky_relu((self.c1(h)))
-        # h = F.average_pooling_2d(h, 2, 2, 0)
-        # h = F.resize_images(h, (h.shape[2]//2, h.shape[3]//2))
         if self.blur_k is None:
             k = np.asarray([1, 2, 1]).astype('f')
             k = k[:, None] * k[None, :]
@@ -378,7 +366,7 @@ class Discriminator(chainer.Chain):
         else:
             k = (stage - 1) // 2
 
-            h_0 = F.leaky_relu(self.ins[k](downscale2x(h))) #  F.resize_images(h, (h.shape[2]//2, h.shape[3]//2))))
+            h_0 = F.leaky_relu(self.ins[k](downscale2x(h)))
             h_1 = self.blocks[k + 1](F.leaky_relu(self.ins[k + 1](x)))
             assert 0. <= alpha < 1.
             h = (1.0 - alpha) * h_0 + alpha * h_1

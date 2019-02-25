@@ -45,7 +45,8 @@ def main():
     np.random.seed(FLAGS.seed)
     xp.random.seed(FLAGS.seed)
 
-    enable_trunction_trick = FLAGS.trc_psi > 0
+    enable_trunction_trick = FLAGS.trc_psi != 1.0
+    
     if enable_trunction_trick:
         print("Calculate average W...")
         w_batch_size = 100

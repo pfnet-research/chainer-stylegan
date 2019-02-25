@@ -20,7 +20,7 @@ import h5py
 import numpy as np
 
 #----------------------------------------------------------------------------
-'''https://github.com/tkarras/progressive_growing_of_gans/blob/master/h5tool.py'''
+'''Modified from https://github.com/tkarras/progressive_growing_of_gans/blob/master/h5tool.py'''
 
 class HDF5Exporter:
     def __init__(self, h5_filename, resolution, channels=3, buffer_size_mb=512):
@@ -185,7 +185,7 @@ class ThreadPool(object):
 def is_power_of_2(v):
     rlog2 = int(np.floor(np.log2(v)))
     return 2 ** rlog2 == v
-    
+
 #----------------------------------------------------------------------------
 
 
