@@ -42,6 +42,12 @@ bash folder_to_multisize_hdf5_cmds.sh 1 YOUR_PATH_TO_RAW_FFHQ_IMAGES
 cd src/stylegan
 bash run_ffhq.sh 2 
 ```
+
+* 1 GPU setting (up to 256x256)
+```
+cd src/stylegan
+bash run_ffhq.sh 1
+```
 ## Results
 
 ![samples](https://i.imgur.com/OUDgy5y.jpg)
