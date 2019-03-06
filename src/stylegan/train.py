@@ -32,7 +32,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)) + os.path.sep + os.pa
 
 import common
 from common.utils.record import record_setting
-from common.datasets.base.base_dataset import BaseDataset, MultiDataset
+from common.datasets.base.base_dataset import BaseDataset
 from config import FLAGS
 from common.utils.save_images import convert_batch_images
 from common.evaluation.fid import API as FIDAPI, fid_extension
