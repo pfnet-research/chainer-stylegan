@@ -169,7 +169,7 @@ class RunningHelper(object):
     def make_dataset(self, stage_int):
         if self.is_master:
             size = 4 * (2 ** ((stage_int + 1) // 2))
-            _dataset = MultiDataset(
+            _dataset = BaseDataset(
                 json.load(open(FLAGS.dataset_config, 'r')),
                 '%dx%d' % (size, size),
                 [["resize", {"probability": 1, "width": size, "height": size, "resample_filter": "ANTIALIAS"}]]
