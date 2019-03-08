@@ -373,4 +373,3 @@ if __name__ == '__main__':
         type, value, tb = sys.exc_info()
         traceback.print_exc()
         pdb.post_mortem(tb)
-        pdb.post_mortem(tb)
