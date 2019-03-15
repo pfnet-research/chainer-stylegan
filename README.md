@@ -48,6 +48,14 @@ bash run_ffhq.sh 2
 cd src/stylegan
 bash run_ffhq.sh 1
 ```
+
+## Pre-trained Model on FFHQ
+[GDrive](https://drive.google.com/open?id=1Yde3i7knsJ3JK9nZ_oHngvweQODFVLD6)
+
+Sampling images on CPU
+`
+python sampling.py --m_style SmoothedGenerator_405000.npz --m_mapping SmoothedMapping_405000.npz --gpu -1
+`
 ## Results
 
 ![samples](https://i.imgur.com/OUDgy5y.jpg)
