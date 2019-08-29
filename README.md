@@ -14,7 +14,9 @@ scipy
 mpi4py
 chainer >= 5.0.0
 cupy >= 5.0.0
+
 ```
+* python >= 3.6.0
 * NVIDIA driver 391.35 or newer, CUDA toolkit 9.0 or newer, cuDNN 7.3.1 or newer.
 * NCCL2 
 * A graphic card with at least 11GB memory to train the 1024x1024 model.
