@@ -309,7 +309,7 @@ class DiscriminatorBlock(chainer.Chain):
             self.blur_k = self.xp.asarray(k)[None, None, :]
 
         if self.enable_blur:
-            h = blur(h)
+            h = blur(h, self.blur_k)
 
         h = F.leaky_relu(downscale2x(self.c1(h)))
         return h
