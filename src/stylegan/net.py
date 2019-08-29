@@ -15,6 +15,7 @@ from common.networks.component.normalization.adain import AdaIN
 from common.networks.component.scale import Scale
 from common.networks.component.rescale import upscale2x, downscale2x, blur
 
+
 class MappingNetwork(chainer.Chain):
     def __init__(self, ch=512):
         super().__init__()
@@ -54,6 +55,7 @@ class MappingNetwork(chainer.Chain):
         for i in range(self.ln):
             h = self.l[i](h)
         return h
+
 
 class NoiseBlock(chainer.Chain):
     def __init__(self, ch):
@@ -96,7 +98,7 @@ class StyleBlock(chainer.Chain):
 
 
 class SynthesisBlock(chainer.Chain):
-    def __init__(self, ch=512, ch_in=512, w_ch= 512, upsample=True, enable_blur=False):
+    def __init__(self, ch=512, ch_in=512, w_ch=512, upsample=True, enable_blur=False):
         super().__init__()
         self.upsample = upsample
         self.ch = ch
@@ -105,7 +107,7 @@ class SynthesisBlock(chainer.Chain):
         with self.init_scope(): 
             if not upsample:
                 self.W = chainer.Parameter(shape=(ch_in, 4, 4))
-                self.W.data[:] = 1 # w_data_tmp
+                self.W.data[:] = 1  # w_data_tmp
 
             self.b0 = L.Bias(axis=1, shape=(ch,))
             self.b1 = L.Bias(axis=1, shape=(ch,))
@@ -131,14 +133,12 @@ class SynthesisBlock(chainer.Chain):
                 k = k[:, None] * k[None, :]
                 k = k / np.sum(k)
                 self.blur_k = self.xp.asarray(k)[None, None, :]
+            h = self.c0(upscale2x(h))
             if self.enable_blur:
-                h = blur(upscale2x(h), self.blur_k)
-            else:
-                h = upscale2x(h)
-            h = self.c0(h)
+                h = blur(h, self.blur_k)
         else:
             h = F.broadcast_to(self.W, (batch_size, self.ch_in, 4, 4))
-        
+      
         # h should be (batch, ch, size, size)
         if add_noise:
             h = self.n0(h)
@@ -161,15 +161,15 @@ class StyleGenerator(chainer.Chain):
         self.max_stage = 17
         with self.init_scope():
             self.blocks = chainer.ChainList(
-                SynthesisBlock(ch, ch, upsample=False), #4
-                SynthesisBlock(ch, ch, upsample=True, enable_blur=enable_blur), #8 
-                SynthesisBlock(ch, ch, upsample=True, enable_blur=enable_blur), #16
-                SynthesisBlock(ch, ch, upsample=True, enable_blur=enable_blur), # 32
-                SynthesisBlock(ch // 2, ch, upsample=True, enable_blur=enable_blur), #64
-                SynthesisBlock(ch // 4, ch // 2, upsample=True, enable_blur=enable_blur), #128
-                SynthesisBlock(ch // 8, ch // 4, upsample=True, enable_blur=enable_blur), #256
-                SynthesisBlock(ch // 16, ch // 8, upsample=True, enable_blur=enable_blur), #512
-                SynthesisBlock(ch // 32, ch // 16, upsample=True, enable_blur=enable_blur) #1024
+                SynthesisBlock(ch, ch, upsample=False),  # 4
+                SynthesisBlock(ch, ch, upsample=True, enable_blur=enable_blur),  # 8 
+                SynthesisBlock(ch, ch, upsample=True, enable_blur=enable_blur),  # 16
+                SynthesisBlock(ch, ch, upsample=True, enable_blur=enable_blur),  # 32
+                SynthesisBlock(ch // 2, ch, upsample=True, enable_blur=enable_blur),  # 64
+                SynthesisBlock(ch // 4, ch // 2, upsample=True, enable_blur=enable_blur),  # 128
+                SynthesisBlock(ch // 8, ch // 4, upsample=True, enable_blur=enable_blur),  # 256
+                SynthesisBlock(ch // 16, ch // 8, upsample=True, enable_blur=enable_blur),  # 512
+                SynthesisBlock(ch // 32, ch // 16, upsample=True, enable_blur=enable_blur)  # 1024
             )
             self.outs = chainer.ChainList(
                 EqualizedConv2d(ch, 3, 1, 1, 0, gain=1),
@@ -246,6 +246,7 @@ class StyleGenerator(chainer.Chain):
             else:
                 return h
 
+
 class Generator(chainer.Chain):
     def __init__(self, ch):
         super(Generator, self).__init__()
@@ -301,16 +302,16 @@ class DiscriminatorBlock(chainer.Chain):
     def __call__(self, x):
         h = x
         h = F.leaky_relu((self.c0(h)))
-        h = F.leaky_relu((self.c1(h)))
         if self.blur_k is None:
             k = np.asarray([1, 2, 1]).astype('f')
             k = k[:, None] * k[None, :]
             k = k / np.sum(k)
             self.blur_k = self.xp.asarray(k)[None, None, :]
+
         if self.enable_blur:
-            h = blur(downscale2x(h), self.blur_k)
-        else:
-            h = downscale2x(h)
+            h = blur(h)
+
+        h = F.leaky_relu(downscale2x(self.c1(h)))
         return h
 
 
